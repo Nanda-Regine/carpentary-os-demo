@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carpentry OS — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fdf8f0;
+  --surface: #f5ede0;
+  --card: #ede4d4;
+  --card2: #e8deca;
+  --border: #d4c0a8;
+  --border2: #c4b098;
+  --gold: #8b5e2a;
+  --gold-light: #a06e35;
+  --gold-dim: rgba(139,94,42,0.1);
+  --gold-glow: rgba(139,94,42,0.06);
+  --cream: #2d1a0e;
+  --muted: #9a7a58;
+  --muted2: #7a5a38;
+  --white: #2d1a0e;
+  --green: #3fb07a;
+  --green-dim: rgba(63,176,122,0.1);
+  --blue: #4e8ef7;
+  --blue-dim: rgba(78,142,247,0.1);
+  --orange: #e07a2a;
+  --orange-dim: rgba(224,122,42,0.1);
+  --red: #e05050;
+  --red-dim: rgba(224,80,80,0.1);
+  --purple: #9b6ef7;
+  --purple-dim: rgba(155,110,247,0.1);
+  --sidebar-w: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg); color:var(--cream);
+  font-family:'DM Sans',sans-serif;
+  display:flex; height:100vh;
+}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sidebar-w); min-width:var(--sidebar-w);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:0; height:100vh; overflow-y:auto;
+}
+.sidebar-brand{
+  padding:20px 18px 16px;
+  border-bottom:1px solid var(--border);
+}
+.brand-logo{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:0.8rem;color:#000;
+  margin-bottom:8px;
+}
+.brand-name{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--white);letter-spacing:0.02em;}
+.brand-sub{font-size:0.62rem;color:var(--muted);margin-top:1px;}
+
+.sidebar-section{padding:14px 12px 6px;}
+.sidebar-section-label{
+  font-family:'Space Mono',monospace;font-size:0.55rem;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);
+  padding:0 6px;margin-bottom:4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:8px;cursor:pointer;
+  transition:all 0.15s;margin-bottom:1px;
+  font-size:0.82rem;font-weight:500;color:var(--muted2);
+  border:1px solid transparent;
+  position:relative;
+}
+.nav-item:hover{background:rgba(0,0,0,0.04);color:var(--cream);}
+.nav-item.active{background:var(--gold-dim);color:var(--gold);border-color:rgba(139,94,42,0.15);}
+.nav-item .nav-icon{font-size:0.9rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;background:var(--red);color:#fff;
+  font-size:0.55rem;font-weight:700;
+  padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;
+}
+.nav-badge.gold{background:var(--gold);color:#000;}
+
+.sidebar-bottom{
+  margin-top:auto;padding:14px 12px;
+  border-top:1px solid var(--border);
+}
+.owner-profile{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+}
+.owner-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#8b5e2a,#6b4518);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:700;color:#fff;flex-shrink:0;
+}
+.owner-name{font-size:0.75rem;font-weight:600;color:var(--cream);}
+.owner-role{font-size:0.6rem;color:var(--muted);}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);margin-left:auto;
+  flex-shrink:0;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+/* ═══ TOP BAR ═══ */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;position:sticky;top:0;z-index:10;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.page-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--white);}
+.page-date{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-btn{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:6px 12px;
+  font-size:0.75rem;font-weight:600;color:var(--cream);cursor:pointer;
+  transition:all 0.15s;font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;gap:6px;
+}
+.topbar-btn:hover{border-color:var(--gold);color:var(--gold);}
+.topbar-btn.primary{background:var(--gold);color:#000;border-color:var(--gold);}
+.topbar-btn.primary:hover{background:var(--gold-light);}
+.notif-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;transition:all 0.15s;
+}
+.notif-btn:hover{border-color:var(--border2);}
+.notif-dot{
+  position:absolute;top:6px;right:6px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);border:1.5px solid var(--surface);
+}
+
+/* ═══ CONTENT PAGES ═══ */
+.page{display:none;padding:24px;flex-direction:column;gap:20px;}
+.page.active{display:flex;}
+
+/* ═══ STATS ROW ═══ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;transition:border-color 0.2s;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:60px;height:60px;border-radius:50%;
+  opacity:0.06;transform:translate(20px,-20px);
+}
+.stat-card.green::before{background:var(--green);}
+.stat-card.gold::before{background:var(--gold);}
+.stat-card.blue::before{background:var(--blue);}
+.stat-card.orange::before{background:var(--orange);}
+.stat-card:hover{border-color:var(--border2);}
+.stat-icon{font-size:1rem;margin-bottom:8px;display:block;}
+.stat-value{
+  font-family:'Syne',sans-serif;font-size:1.6rem;
+  font-weight:800;color:var(--white);line-height:1;margin-bottom:4px;
+}
+.stat-label{font-size:0.72rem;color:var(--muted);margin-bottom:6px;}
+.stat-change{
+  font-size:0.65rem;font-weight:600;
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:20px;
+}
+.stat-change.up{background:var(--green-dim);color:var(--green);}
+.stat-change.warn{background:var(--orange-dim);color:var(--orange);}
+
+/* ═══ GRID LAYOUT ═══ */
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;}
+.content-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.full-width{grid-column:1/-1;}
+
+/* ═══ PANEL ═══ */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+}
+.panel-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{
+  font-family:'Syne',sans-serif;font-size:0.85rem;
+  font-weight:700;color:var(--white);
+  display:flex;align-items:center;gap:8px;
+}
+.panel-action{
+  font-size:0.7rem;color:var(--gold);cursor:pointer;font-weight:600;
+}
+.panel-action:hover{color:var(--gold-light);}
+.panel-body{padding:14px 18px;}
+
+/* ═══ JOB CARDS ═══ */
+.job-list{display:flex;flex-direction:column;gap:10px;}
+.job-card{
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:14px;transition:border-color 0.2s;cursor:pointer;
+}
+.job-card:hover{border-color:var(--border2);}
+.job-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.job-id{
+  font-family:'Space Mono',monospace;font-size:0.58rem;
+  color:var(--gold);margin-bottom:3px;
+}
+.job-name{font-size:0.85rem;font-weight:600;color:var(--white);}
+.job-client{font-size:0.72rem;color:var(--muted);}
+.status-pill{
+  font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;flex-shrink:0;
+}
+.pill-quoted{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(78,142,247,0.2);}
+.pill-confirmed{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(155,110,247,0.2);}
+.pill-production{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(224,122,42,0.2);}
+.pill-ready{background:var(--green-dim);color:var(--green);border:1px solid rgba(63,176,122,0.2);}
+.pill-delivered{background:rgba(255,255,255,0.05);color:var(--muted2);border:1px solid var(--border);}
+.pill-new{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(139,94,42,0.2);}
+
+.job-progress{margin-bottom:10px;}
+.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;}
+.progress-bar{height:100%;border-radius:2px;transition:width 0.6s ease;}
+.bar-orange{background:var(--orange);}
+.bar-green{background:var(--green);}
+.bar-blue{background:var(--blue);}
+.bar-gold{background:var(--gold);}
+
+.job-footer{display:flex;align-items:center;justify-content:space-between;}
+.job-value{font-size:0.8rem;font-weight:700;color:var(--cream);}
+.job-eta{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);}
+.job-actions{display:flex;gap:6px;}
+.action-btn{
+  padding:5px 10px;border-radius:6px;font-size:0.68rem;font-weight:600;
+  cursor:pointer;border:none;font-family:'DM Sans',sans-serif;
+  transition:all 0.15s;
+}
+.action-btn.advance{background:var(--gold);color:#000;}
+.action-btn.advance:hover{background:var(--gold-light);}
+.action-btn.msg{background:var(--card);color:var(--cream);border:1px solid var(--border);}
+.action-btn.msg:hover{border-color:var(--border2);}
+
+/* ═══ QUICK STATS ═══ */
+.mini-stat-row{display:flex;flex-direction:column;gap:10px;}
+.mini-stat{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:var(--card2);border-radius:10px;
+  border:1px solid var(--border);
+}
+.mini-stat .ms-label{font-size:0.75rem;color:var(--muted2);}
+.mini-stat .ms-val{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:var(--white);}
+.mini-stat .ms-icon{font-size:1rem;margin-right:8px;}
+
+/* ═══ NOTIFICATION FEED ═══ */
+.notif-list{display:flex;flex-direction:column;gap:1px;}
+.notif-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.notif-item:last-child{border:none;}
+.notif-dot2{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.nd-gold{background:var(--gold);}
+.nd-green{background:var(--green);}
+.nd-blue{background:var(--blue);}
+.nd-red{background:var(--red);}
+.notif-text{font-size:0.75rem;color:var(--cream);line-height:1.4;}
+.notif-text span{color:var(--muted);font-size:0.65rem;display:block;margin-top:2px;}
+.notif-unread{font-size:0.6rem;background:var(--gold-dim);color:var(--gold);padding:1px 6px;border-radius:10px;margin-left:auto;flex-shrink:0;}
+
+/* ═══ REVENUE CHART ═══ */
+.chart-area{padding:8px 0 0;}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:100px;margin-bottom:8px;}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chart-bar{
+  width:100%;border-radius:4px 4px 0 0;
+  background:var(--border);position:relative;overflow:hidden;
+  transition:background 0.2s;cursor:pointer;min-height:4px;
+}
+.chart-bar::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%);
+}
+.chart-bar:hover{background:var(--gold) !important;}
+.chart-bar.active{background:var(--gold) !important;}
+.chart-bar .bar-tooltip{
+  position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:var(--border);color:var(--cream);
+  font-size:0.55rem;font-weight:700;padding:3px 6px;border-radius:4px;
+  white-space:nowrap;opacity:0;transition:opacity 0.15s;pointer-events:none;
+}
+.chart-bar:hover .bar-tooltip{opacity:1;}
+.chart-label{font-size:0.58rem;color:var(--muted);font-family:'Space Mono',monospace;}
+.chart-legend{display:flex;gap:12px;justify-content:flex-end;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:0.65rem;color:var(--muted);}
+.legend-dot{width:8px;height:8px;border-radius:2px;}
+
+/* ═══ INCOMING BOOKING ═══ */
+.booking-alert{
+  background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));
+  border:1px solid rgba(201,168,76,0.25);border-radius:14px;padding:16px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.booking-alert-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.booking-alert-info{flex:1;}
+.booking-alert-title{font-size:0.85rem;font-weight:700;color:var(--white);margin-bottom:3px;}
+.booking-alert-sub{font-size:0.72rem;color:var(--muted2);margin-bottom:10px;line-height:1.5;}
+.booking-alert-actions{display:flex;gap:8px;}
+
+/* ═══ CLIENT TABLE ═══ */
+.client-table{width:100%;border-collapse:collapse;}
+.client-table th{
+  font-family:'Space Mono',monospace;font-size:0.55rem;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
+  padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);
+}
+.client-table td{
+  padding:10px;font-size:0.78rem;color:var(--cream);
+  border-bottom:1px solid rgba(0,0,0,0.04);
+}
+.client-table tr:hover td{background:rgba(255,255,255,0.02);}
+.client-avatar-sm{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--card2);border:1px solid var(--border);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:0.6rem;font-weight:700;color:var(--gold);
+  margin-right:8px;vertical-align:middle;
+}
+.client-name-cell{display:flex;align-items:center;}
+
+/* ═══ QUOTE MANAGER ═══ */
+.quote-list{display:flex;flex-direction:column;gap:8px;}
+.quote-item{
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:12px;display:flex;align-items:center;gap:12px;
+  transition:border-color 0.2s;cursor:pointer;
+}
+.quote-item:hover{border-color:var(--border2);}
+.quote-num{
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  color:var(--gold);min-width:80px;
+}
+.quote-desc{font-size:0.78rem;color:var(--cream);flex:1;}
+.quote-client{font-size:0.68rem;color:var(--muted);}
+.quote-amount{font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;color:var(--white);min-width:80px;text-align:right;}
+.quote-status-pill{font-size:0.58rem;font-weight:700;padding:3px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;}
+.qs-pending{background:var(--orange-dim);color:var(--orange);}
+.qs-approved{background:var(--green-dim);color:var(--green);}
+.qs-sent{background:var(--blue-dim);color:var(--blue);}
+
+/* ═══ ONE TAP PANEL ═══ */
+.onetap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.onetap-btn{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;cursor:pointer;
+  transition:all 0.2s;text-align:center;
+}
+.onetap-btn:hover{border-color:var(--gold);background:var(--gold-glow);transform:translateY(-2px);}
+.onetap-btn:active{transform:translateY(0);}
+.onetap-btn .ot-icon{font-size:1.4rem;margin-bottom:6px;display:block;}
+.onetap-btn .ot-label{font-size:0.72rem;font-weight:600;color:var(--cream);}
+.onetap-btn .ot-sub{font-size:0.6rem;color:var(--muted);margin-top:2px;}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--green);color:#fff;
+  padding:10px 18px;border-radius:10px;font-size:0.78rem;font-weight:600;
+  z-index:999;opacity:0;transform:translateY(10px);
+  transition:all 0.3s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ═══ KANBAN ═══ */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;}
+.kanban-col{min-width:220px;flex-shrink:0;}
+.kanban-col-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;padding:0 4px;
+}
+.kanban-col-title{font-size:0.75rem;font-weight:700;color:var(--white);}
+.kanban-count{
+  font-family:'Space Mono',monospace;font-size:0.58rem;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);padding:2px 7px;border-radius:10px;
+}
+.kanban-items{display:flex;flex-direction:column;gap:8px;}
+.kanban-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:12px;cursor:pointer;transition:all 0.15s;
+}
+.kanban-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.kc-id{font-family:'Space Mono',monospace;font-size:0.55rem;color:var(--gold);margin-bottom:4px;}
+.kc-name{font-size:0.78rem;font-weight:600;color:var(--white);margin-bottom:3px;}
+.kc-client{font-size:0.65rem;color:var(--muted);}
+.kc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.kc-value{font-size:0.72rem;font-weight:700;color:var(--cream);}
+.kc-eta{font-size:0.6rem;color:var(--muted);}
+.kc-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;}
+
+/* ═══ SCROLL ═══ */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.page.active > *{
+  animation:fadeSlideUp 0.3s ease both;
+}
+.page.active > *:nth-child(2){animation-delay:0.05s;}
+.page.active > *:nth-child(3){animation-delay:0.1s;}
+.page.active > *:nth-child(4){animation-delay:0.15s;}
+
+/* ── MOBILE FIXES ── */
+@media (max-width: 768px) {
+  html, body { overflow: auto !important; height: auto !important; }
+  body { display: block !important; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 1000;
+    transform: translateX(-100%); transition: transform 0.3s ease;
+    height: 100vh !important;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,0.5);
+  }
+  .sidebar-overlay.open { display: block; }
+  .mobile-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: #f5ede0; border-bottom: 1px solid #d4c0a8;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .mobile-header .brand { font-size: 0.9rem; font-weight: 600; color: #8b5e2a; }
+  .hamburger { background: none; border: none; color: #888; font-size: 1.4rem; cursor: pointer; padding: 4px; }
+  .mobile-home-btn { font-size: 0.72rem; color: #888; text-decoration: none; border: 1px solid #2a2a2a; border-radius: 6px; padding: 4px 10px; transition: color 0.15s, border-color 0.15s; }
+  .mobile-home-btn:hover { color: #8b5e2a; border-color: #8b5e2a; }
+  .main { width: 100% !important; min-width: 0 !important; padding-bottom: 80px !important; }
+}
+@media (min-width: 769px) {
+  .mobile-header { display: none; }
+  .sidebar-overlay { display: none !important; }
+}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+  background: #f5ede0; border-top: 1px solid #d4c0a8;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+@media (max-width: 768px) {
+  .mobile-bottom-nav { display: flex; }
+}
+.mbn-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; text-decoration: none; color: #888; padding: 4px 0;
+  font-family: sans-serif;
+}
+.mbn-item.active { color: #8b5e2a; }
+.mbn-icon { font-size: 1.2rem; line-height: 1; }
+.mbn-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <span class="brand">Carpentry OS</span>
+  <a href="index.html" class="mobile-home-btn">← Home</a>
+</div>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo">KK</div>
+    <div class="brand-name">Carpentry OS</div>
+    <div class="brand-sub">Admin Dashboard</div>
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-size:0.7rem;color:#666;text-decoration:none;border:1px solid #272727;border-radius:5px;padding:3px 9px;transition:color .15s,border-color .15s;" onmouseover="this.style.color='#8b5e2a';this.style.borderColor='#8b5e2a'" onmouseout="this.style.color='#9a7a58';this.style.borderColor='#d4c0a8'">← Back to Home</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Main</div>
+    <div class="nav-item active" onclick="showPage('overview',this)">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+    <div class="nav-item" onclick="showPage('jobs',this)">
+      <span class="nav-icon">⚒️</span> Active Jobs
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('bookings',this)">
+      <span class="nav-icon">📅</span> Bookings
+      <span class="nav-badge gold">2</span>
+    </div>
+    <div class="nav-item" onclick="showPage('quotes',this)">
+      <span class="nav-icon">📄</span> Quotes
+    </div>
+    <div class="nav-item" onclick="showPage('clients',this)">
+      <span class="nav-icon">👤</span> Clients
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Finance</div>
+    <div class="nav-item" onclick="showPage('revenue',this)">
+      <span class="nav-icon">💰</span> Revenue
+    </div>
+    <div class="nav-item" onclick="showPage('materials',this)">
+      <span class="nav-icon">🪵</span> Materials
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Quick Actions</div>
+    <div class="nav-item" onclick="showPage('onetap',this)">
+      <span class="nav-icon">⚡</span> One-Tap Updates
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="owner-profile">
+      <div class="owner-avatar">MJ</div>
+      <div>
+        <div class="owner-name">Business Owner</div>
+        <div class="owner-role">Founder · Carpentry Co.</div>
+      </div>
+      <div class="status-dot"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="page-heading">Overview</div>
+        <div class="page-date">Wednesday, 5 March 2026</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="showToast('Opening Notion workspace...')">📎 Notion</button>
+      <button class="topbar-btn primary" onclick="showToast('New quote form opened!')">+ New Quote</button>
+      <div class="notif-btn" onclick="showToast('2 unread notifications')">
+        🔔 <div class="notif-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: OVERVIEW ═══ -->
+  <div class="page active" id="page-overview">
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card green">
+        <span class="stat-icon">💰</span>
+        <div class="stat-value">R38,500</div>
+        <div class="stat-label">Revenue This Month</div>
+        <span class="stat-change up">↑ 28% vs last month</span>
+      </div>
+      <div class="stat-card gold">
+        <span class="stat-icon">⚒️</span>
+        <div class="stat-value">5</div>
+        <div class="stat-label">Active Jobs</div>
+        <span class="stat-change up">↑ 2 new this week</span>
+      </div>
+      <div class="stat-card blue">
+        <span class="stat-icon">📅</span>
+        <div class="stat-value">2</div>
+        <div class="stat-label">New Bookings</div>
+        <span class="stat-change warn">Need response today</span>
+      </div>
+      <div class="stat-card orange">
+        <span class="stat-icon">📄</span>
+        <div class="stat-value">R24,000</div>
+        <div class="stat-label">Pending Quotes</div>
+        <span class="stat-change up">3 awaiting approval</span>
+      </div>
+    </div>
+
+    <!-- Incoming Booking Alert -->
+    <div class="booking-alert">
+      <div class="booking-alert-icon">📅</div>
+      <div class="booking-alert-info">
+        <div class="booking-alert-title">New Booking — Sipho Dlamini just booked!</div>
+        <div class="booking-alert-sub">Custom furniture consultation · Thu 5 March · 10:00 AM · Deposit R1,500 paid ✓<br>Requirements: L-shaped couch + TV unit, grey fabric · 3m × 2.5m living room</div>
+        <div class="booking-alert-actions">
+          <button class="action-btn advance" onclick="showToast('Job card #KK-2026-0048 created! WhatsApp sent to Sipho ✓')">✓ Accept & Create Job Card</button>
+          <button class="action-btn msg" onclick="showToast('Opening WhatsApp to Sipho...')">💬 WhatsApp Client</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Active Jobs -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">⚒️ Active Jobs</span>
+          <span class="panel-action" onclick="showPage('jobs',null)">View all →</span>
+        </div>
+        <div class="panel-body">
+          <div class="job-list">
+
+            <div class="job-card">
+              <div class="job-card-top">
+                <div>
+                  <div class="job-id">#KK-2026-0043</div>
+                  <div class="job-name">Kitchen Fit-Out (Oak Finish)</div>
+                  <div class="job-client">Nomsa Dube · 083 444 5555</div>
+                </div>
+                <span class="status-pill pill-production">Production</span>
+              </div>
+              <div class="job-progress">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted)"><span>Progress</span><span>60%</span></div>
+                <div class="progress-track"><div class="progress-bar bar-orange" style="width:60%"></div></div>
+              </div>
+              <div class="job-footer">
+                <div>
+                  <div class="job-value">R28,000</div>
+                  <div class="job-eta">ETA: 22 March</div>
+                </div>
+                <div class="job-actions">
+                  <button class="action-btn msg" onclick="showToast('WhatsApp opened for Nomsa')">💬</button>
+                  <button class="action-btn advance" onclick="advanceJob(this,'Nomsa Dube','Kitchen Fit-Out','Ready for Delivery')">Advance Status ▶</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="job-card">
+              <div class="job-card-top">
+                <div>
+                  <div class="job-id">#KK-2026-0041</div>
+                  <div class="job-name">Built-In Bedroom Wardrobes</div>
+                  <div class="job-client">Thabo Khumalo · 071 888 2233</div>
+                </div>
+                <span class="status-pill pill-ready">Ready ✓</span>
+              </div>
+              <div class="job-progress">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted)"><span>Progress</span><span>100%</span></div>
+                <div class="progress-track"><div class="progress-bar bar-green" style="width:100%"></div></div>
+              </div>
+              <div class="job-footer">
+                <div>
+                  <div class="job-value">R15,500</div>
+                  <div class="job-eta">Ready for delivery</div>
+                </div>
+                <div class="job-actions">
+                  <button class="action-btn msg" onclick="showToast('WhatsApp sent to Thabo: Your wardrobes are ready! 🎉')">💬</button>
+                  <button class="action-btn advance" onclick="advanceJob(this,'Thabo Khumalo','Wardrobes','Delivered')">Mark Delivered ▶</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="job-card">
+              <div class="job-card-top">
+                <div>
+                  <div class="job-id">#KK-2026-0039</div>
+                  <div class="job-name">Office Desk Setup (4 desks)</div>
+                  <div class="job-client">Lerato Corp · 011 333 4444</div>
+                </div>
+                <span class="status-pill pill-confirmed">Confirmed</span>
+              </div>
+              <div class="job-progress">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted)"><span>Progress</span><span>20%</span></div>
+                <div class="progress-track"><div class="progress-bar bar-blue" style="width:20%"></div></div>
+              </div>
+              <div class="job-footer">
+                <div>
+                  <div class="job-value">R32,000</div>
+                  <div class="job-eta">Starts: 10 March</div>
+                </div>
+                <div class="job-actions">
+                  <button class="action-btn msg" onclick="showToast('WhatsApp opened for Lerato Corp')">💬</button>
+                  <button class="action-btn advance" onclick="advanceJob(this,'Lerato Corp','Office Desks','In Production')">Start Production ▶</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Notifications -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">🔔 Activity Feed</span>
+            <span class="panel-action">Clear all</span>
+          </div>
+          <div class="panel-body">
+            <div class="notif-list">
+              <div class="notif-item">
+                <div class="notif-dot2 nd-gold"></div>
+                <div class="notif-text">
+                  New booking from <strong>Sipho Dlamini</strong> — R1,500 deposit paid
+                  <span>2 minutes ago</span>
+                </div>
+                <span class="notif-unread">NEW</span>
+              </div>
+              <div class="notif-item">
+                <div class="notif-dot2 nd-green"></div>
+                <div class="notif-text">
+                  <strong>Thabo Khumalo</strong> approved quote #Q-2026-0021
+                  <span>1 hour ago</span>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-dot2 nd-blue"></div>
+                <div class="notif-text">
+                  <strong>Nomsa Dube</strong> viewed her order status portal
+                  <span>3 hours ago</span>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-dot2 nd-gold"></div>
+                <div class="notif-text">
+                  Payment received: <strong>R14,000</strong> from Lerato Corp (final)
+                  <span>Yesterday</span>
+                </div>
+              </div>
+              <div class="notif-item">
+                <div class="notif-dot2 nd-green"></div>
+                <div class="notif-text">
+                  <strong>5-star review</strong> left by Zanele Mokoena 🌟
+                  <span>Yesterday</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">📈 March At a Glance</span>
+          </div>
+          <div class="panel-body">
+            <div class="mini-stat-row">
+              <div class="mini-stat">
+                <span class="ms-icon">💳</span>
+                <span class="ms-label">Deposits Collected</span>
+                <span class="ms-val" style="color:var(--green)">R8,500</span>
+              </div>
+              <div class="mini-stat">
+                <span class="ms-icon">📦</span>
+                <span class="ms-label">Jobs Delivered</span>
+                <span class="ms-val">3</span>
+              </div>
+              <div class="mini-stat">
+                <span class="ms-icon">⭐</span>
+                <span class="ms-label">Reviews This Month</span>
+                <span class="ms-val" style="color:var(--gold)">5 × 5★</span>
+              </div>
+              <div class="mini-stat">
+                <span class="ms-icon">📱</span>
+                <span class="ms-label">WhatsApps Automated</span>
+                <span class="ms-val">47</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: JOBS ═══ -->
+  <div class="page" id="page-jobs">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">⚒️ All Active Jobs — Kanban View</span>
+        <div style="display:flex;gap:8px;">
+          <button class="topbar-btn" onclick="showToast('Exporting jobs to PDF...')">Export</button>
+          <button class="topbar-btn primary" onclick="showToast('New job form opened!')">+ New Job</button>
+        </div>
+      </div>
+      <div class="panel-body" style="overflow-x:auto;">
+        <div class="kanban">
+          <!-- Quoted -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span class="kanban-col-title" style="color:var(--blue)">● Quoted</span>
+              <span class="kanban-count">2</span>
+            </div>
+            <div class="kanban-items">
+              <div class="kanban-card">
+                <div class="kc-id">#KK-2026-0047</div>
+                <div class="kc-name">L-Shape Couch + TV Unit</div>
+                <div class="kc-client">Sipho Dlamini</div>
+                <div class="kc-footer"><span class="kc-value">R12,500</span><span class="kc-eta">Quoted today</span></div>
+                <div class="kc-bar"><div style="width:10%;height:100%;background:var(--blue);border-radius:2px;"></div></div>
+              </div>
+              <div class="kanban-card">
+                <div class="kc-id">#KK-2026-0046</div>
+                <div class="kc-name">Dining Room Set (6-seater)</div>
+                <div class="kc-client">Ayanda Mthembu</div>
+                <div class="kc-footer"><span class="kc-value">R18,000</span><span class="kc-eta">Quote sent 3 Mar</span></div>
+                <div class="kc-bar"><div style="width:10%;height:100%;background:var(--blue);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Confirmed -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span class="kanban-col-title" style="color:var(--purple)">● Confirmed</span>
+              <span class="kanban-count">1</span>
+            </div>
+            <div class="kanban-items">
+              <div class="kanban-card">
+                <div class="kc-id">#KK-2026-0039</div>
+                <div class="kc-name">Office Desk Setup (4 desks)</div>
+                <div class="kc-client">Lerato Corp</div>
+                <div class="kc-footer"><span class="kc-value">R32,000</span><span class="kc-eta">Starts 10 Mar</span></div>
+                <div class="kc-bar"><div style="width:20%;height:100%;background:var(--purple);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- In Production -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span class="kanban-col-title" style="color:var(--orange)">● In Production</span>
+              <span class="kanban-count">1</span>
+            </div>
+            <div class="kanban-items">
+              <div class="kanban-card">
+                <div class="kc-id">#KK-2026-0043</div>
+                <div class="kc-name">Kitchen Fit-Out (Oak)</div>
+                <div class="kc-client">Nomsa Dube</div>
+                <div class="kc-footer"><span class="kc-value">R28,000</span><span class="kc-eta">ETA: 22 Mar</span></div>
+                <div class="kc-bar"><div style="width:60%;height:100%;background:var(--orange);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Ready -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span class="kanban-col-title" style="color:var(--green)">● Ready</span>
+              <span class="kanban-count">1</span>
+            </div>
+            <div class="kanban-items">
+              <div class="kanban-card">
+                <div class="kc-id">#KK-2026-0041</div>
+                <div class="kc-name">Built-In Wardrobes</div>
+                <div class="kc-client">Thabo Khumalo</div>
+                <div class="kc-footer"><span class="kc-value">R15,500</span><span class="kc-eta">Ready now</span></div>
+                <div class="kc-bar"><div style="width:100%;height:100%;background:var(--green);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Delivered -->
+          <div class="kanban-col">
+            <div class="kanban-col-header">
+              <span class="kanban-col-title" style="color:var(--muted2)">● Delivered</span>
+              <span class="kanban-count">3</span>
+            </div>
+            <div class="kanban-items">
+              <div class="kanban-card" style="opacity:0.6;">
+                <div class="kc-id">#KK-2026-0037</div>
+                <div class="kc-name">Study Desk + Bookshelf</div>
+                <div class="kc-client">Zanele Mokoena</div>
+                <div class="kc-footer"><span class="kc-value">R9,500</span><span class="kc-eta">Delivered 28 Feb</span></div>
+                <div class="kc-bar"><div style="width:100%;height:100%;background:var(--muted);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: BOOKINGS ═══ -->
+  <div class="page" id="page-bookings">
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card gold">
+        <span class="stat-icon">📅</span>
+        <div class="stat-value">2</div>
+        <div class="stat-label">New This Week</div>
+        <span class="stat-change warn">Action needed</span>
+      </div>
+      <div class="stat-card green">
+        <span class="stat-icon">💳</span>
+        <div class="stat-value">R3,000</div>
+        <div class="stat-label">Deposits Collected</div>
+        <span class="stat-change up">Auto-collected</span>
+      </div>
+      <div class="stat-card blue">
+        <span class="stat-icon">📆</span>
+        <div class="stat-value">8</div>
+        <div class="stat-label">This Month Total</div>
+        <span class="stat-change up">↑ Best month ever</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📅 Incoming Bookings</span>
+        <button class="topbar-btn primary" onclick="showToast('Opening booking calendar...')">+ Manual Booking</button>
+      </div>
+      <div class="panel-body">
+        <div class="job-list">
+          <div class="booking-alert" style="margin-bottom:0;">
+            <div class="booking-alert-icon">📅</div>
+            <div class="booking-alert-info">
+              <div class="booking-alert-title">Sipho Dlamini — Custom Furniture</div>
+              <div class="booking-alert-sub">Thu 5 March 2026 · 10:00 AM · R1,500 deposit paid ✓<br>L-shaped couch + TV unit · Grey fabric · 3m × 2.5m</div>
+              <div class="booking-alert-actions">
+                <button class="action-btn advance" onclick="showToast('Job card #KK-2026-0048 created! Confirmation WhatsApp sent ✓')">✓ Accept & Create Job Card</button>
+                <button class="action-btn msg" onclick="showToast('WhatsApp opened')">💬 Message</button>
+                <button class="action-btn msg" onclick="showToast('Booking declined. Refund initiated.')">✕ Decline</button>
+              </div>
+            </div>
+          </div>
+          <div style="height:10px;"></div>
+          <div class="booking-alert" style="background:rgba(78,142,247,0.05);border-color:rgba(78,142,247,0.2);">
+            <div class="booking-alert-icon" style="background:var(--blue);">📅</div>
+            <div class="booking-alert-info">
+              <div class="booking-alert-title">Ayanda Mthembu — Dining Room Set</div>
+              <div class="booking-alert-sub">Mon 9 March 2026 · 2:00 PM · R1,500 deposit paid ✓<br>6-seater dining set · Dark walnut finish · Quote requested</div>
+              <div class="booking-alert-actions">
+                <button class="action-btn advance" onclick="showToast('Job card created! WhatsApp sent to Ayanda ✓')">✓ Accept & Create Job Card</button>
+                <button class="action-btn msg" onclick="showToast('WhatsApp opened for Ayanda')">💬 Message</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: QUOTES ═══ -->
+  <div class="page" id="page-quotes">
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card orange"><span class="stat-icon">📄</span><div class="stat-value">3</div><div class="stat-label">Pending Approval</div><span class="stat-change warn">Follow up today</span></div>
+      <div class="stat-card green"><span class="stat-icon">✅</span><div class="stat-value">R56,500</div><div class="stat-label">Approved This Month</div><span class="stat-change up">↑ 4 quotes</span></div>
+      <div class="stat-card blue"><span class="stat-icon">📊</span><div class="stat-value">78%</div><div class="stat-label">Quote Conversion Rate</div><span class="stat-change up">↑ Industry avg: 45%</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📄 Quote Manager</span>
+        <button class="topbar-btn primary" onclick="showToast('New quote form opened!')">+ Generate Quote</button>
+      </div>
+      <div class="panel-body">
+        <div class="quote-list">
+          <div class="quote-item">
+            <div><div class="quote-num">#Q-2026-0024</div><div class="quote-desc">L-Shape Couch + TV Unit</div><div class="quote-client">Sipho Dlamini</div></div>
+            <div class="quote-amount">R12,500</div>
+            <span class="quote-status-pill qs-pending">Pending</span>
+            <button class="action-btn msg" onclick="showToast('Reminder sent to Sipho via WhatsApp')">Send Reminder</button>
+          </div>
+          <div class="quote-item">
+            <div><div class="quote-num">#Q-2026-0023</div><div class="quote-desc">Dining Room Set (6-seater)</div><div class="quote-client">Ayanda Mthembu</div></div>
+            <div class="quote-amount">R18,000</div>
+            <span class="quote-status-pill qs-sent">Sent</span>
+            <button class="action-btn msg" onclick="showToast('Following up with Ayanda...')">Follow Up</button>
+          </div>
+          <div class="quote-item">
+            <div><div class="quote-num">#Q-2026-0022</div><div class="quote-desc">Home Office (2 desks + shelf)</div><div class="quote-client">Priya Naidoo</div></div>
+            <div class="quote-amount">R14,500</div>
+            <span class="quote-status-pill qs-pending">Pending</span>
+            <button class="action-btn msg" onclick="showToast('Reminder sent to Priya')">Send Reminder</button>
+          </div>
+          <div class="quote-item" style="opacity:0.6;">
+            <div><div class="quote-num">#Q-2026-0021</div><div class="quote-desc">Built-In Wardrobes (x3)</div><div class="quote-client">Thabo Khumalo</div></div>
+            <div class="quote-amount">R15,500</div>
+            <span class="quote-status-pill qs-approved">Approved ✓</span>
+            <button class="action-btn advance" onclick="showToast('Invoice generated for Thabo')">Invoice</button>
+          </div>
+          <div class="quote-item" style="opacity:0.6;">
+            <div><div class="quote-num">#Q-2026-0020</div><div class="quote-desc">Kitchen Fit-Out (Oak)</div><div class="quote-client">Nomsa Dube</div></div>
+            <div class="quote-amount">R28,000</div>
+            <span class="quote-status-pill qs-approved">Approved ✓</span>
+            <button class="action-btn advance" onclick="showToast('Invoice sent to Nomsa')">Invoice</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: CLIENTS ═══ -->
+  <div class="page" id="page-clients">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">👤 Client Database</span>
+        <div style="display:flex;gap:8px;">
+          <button class="topbar-btn" onclick="showToast('Exporting client list...')">Export CSV</button>
+          <button class="topbar-btn primary" onclick="showToast('Add client form opened')">+ Add Client</button>
+        </div>
+      </div>
+      <div class="panel-body" style="overflow-x:auto;">
+        <table class="client-table">
+          <thead>
+            <tr>
+              <th>Client</th><th>Phone</th><th>Jobs</th><th>Total Spent</th><th>Last Job</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="client-name-cell"><span class="client-avatar-sm">SD</span>Sipho Dlamini</div></td>
+              <td>+27 82 555 0123</td>
+              <td>1 active</td>
+              <td style="color:var(--gold)">R1,500 dep.</td>
+              <td>Today</td>
+              <td><span class="status-pill pill-new">New</span></td>
+              <td><button class="action-btn msg" onclick="showToast('Opening Sipho profile...')">View</button></td>
+            </tr>
+            <tr>
+              <td><div class="client-name-cell"><span class="client-avatar-sm">ND</span>Nomsa Dube</div></td>
+              <td>+27 83 444 5555</td>
+              <td>2 total</td>
+              <td style="color:var(--gold)">R42,000</td>
+              <td>Jan 2026</td>
+              <td><span class="status-pill pill-production">Active</span></td>
+              <td><button class="action-btn msg" onclick="showToast('Opening Nomsa profile...')">View</button></td>
+            </tr>
+            <tr>
+              <td><div class="client-name-cell"><span class="client-avatar-sm">TK</span>Thabo Khumalo</div></td>
+              <td>+27 71 888 2233</td>
+              <td>1 total</td>
+              <td style="color:var(--gold)">R15,500</td>
+              <td>Feb 2026</td>
+              <td><span class="status-pill pill-ready">Ready</span></td>
+              <td><button class="action-btn msg" onclick="showToast('Opening Thabo profile...')">View</button></td>
+            </tr>
+            <tr>
+              <td><div class="client-name-cell"><span class="client-avatar-sm">ZM</span>Zanele Mokoena</div></td>
+              <td>+27 79 222 8888</td>
+              <td>3 total</td>
+              <td style="color:var(--gold)">R34,000</td>
+              <td>28 Feb 2026</td>
+              <td><span class="status-pill pill-delivered">Repeat ⭐</span></td>
+              <td><button class="action-btn advance" onclick="showToast('Referral invite sent to Zanele!')">Refer</button></td>
+            </tr>
+            <tr>
+              <td><div class="client-name-cell"><span class="client-avatar-sm">LC</span>Lerato Corp</div></td>
+              <td>+27 11 333 4444</td>
+              <td>2 total</td>
+              <td style="color:var(--gold)">R58,000</td>
+              <td>Mar 2026</td>
+              <td><span class="status-pill pill-confirmed">Corporate</span></td>
+              <td><button class="action-btn msg" onclick="showToast('Opening Lerato Corp profile...')">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: REVENUE ═══ -->
+  <div class="page" id="page-revenue">
+    <div class="stats-row">
+      <div class="stat-card green"><span class="stat-icon">📈</span><div class="stat-value">R38,500</div><div class="stat-label">March Revenue</div><span class="stat-change up">↑ 28% vs Feb</span></div>
+      <div class="stat-card gold"><span class="stat-icon">💰</span><div class="stat-value">R142,500</div><div class="stat-label">Year to Date</div><span class="stat-change up">↑ On target</span></div>
+      <div class="stat-card blue"><span class="stat-icon">📊</span><div class="stat-value">R14,200</div><div class="stat-label">Avg Job Value</div><span class="stat-change up">↑ R2,800 vs last Q</span></div>
+      <div class="stat-card orange"><span class="stat-icon">💸</span><div class="stat-value">R8,400</div><div class="stat-label">Material Costs</div><span class="stat-change warn">22% of revenue</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">📊 Monthly Revenue — 2026</span></div>
+      <div class="panel-body">
+        <div class="chart-area">
+          <div class="chart-bars" id="revenue-chart"></div>
+          <div style="display:flex;justify-content:space-around;padding:0 4px;">
+            <span class="chart-label">Jan</span><span class="chart-label">Feb</span><span class="chart-label">Mar</span><span class="chart-label">Apr</span><span class="chart-label">May</span><span class="chart-label">Jun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: MATERIALS ═══ -->
+  <div class="page" id="page-materials">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">🪵 Material Cost Tracker</span><button class="topbar-btn primary" onclick="showToast('Add material cost form opened')">+ Add Cost</button></div>
+      <div class="panel-body" style="overflow-x:auto;">
+        <table class="client-table">
+          <thead><tr><th>Job</th><th>Material</th><th>Supplier</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#KK-0043 — Kitchen</td><td>Oak veneer sheet</td><td>Timber World JHB</td><td>8 sheets</td><td>R380</td><td style="color:var(--orange)">R3,040</td><td><span class="quote-status-pill qs-approved">Purchased</span></td></tr>
+            <tr><td>#KK-0043 — Kitchen</td><td>Cabinet hinges (x40)</td><td>Hardware Depot</td><td>40 units</td><td>R28</td><td style="color:var(--orange)">R1,120</td><td><span class="quote-status-pill qs-approved">Purchased</span></td></tr>
+            <tr><td>#KK-0039 — Office</td><td>Melamine board</td><td>Board & More</td><td>12 sheets</td><td>R290</td><td style="color:var(--orange)">R3,480</td><td><span class="quote-status-pill qs-pending">Ordered</span></td></tr>
+            <tr><td>#KK-0047 — Couch</td><td>Grey fabric (per m²)</td><td>Fabric House</td><td>15 m²</td><td>R185</td><td style="color:var(--gold)">R2,775</td><td><span class="quote-status-pill qs-sent">Planned</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: ONE-TAP UPDATES ═══ -->
+  <div class="page" id="page-onetap">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">⚡ One-Tap Status Updates</span>
+        <span style="font-size:0.72rem;color:var(--muted)">Owner taps once → client gets WhatsApp automatically</span>
+      </div>
+      <div class="panel-body">
+        <div style="margin-bottom:16px;">
+          <div style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Select Job to Update</div>
+          <select onchange="updateJobSelect(this)" style="background:var(--card2);border:1px solid var(--border);color:var(--cream);padding:10px 14px;border-radius:10px;font-size:0.82rem;width:100%;font-family:'DM Sans',sans-serif;outline:none;">
+            <option value="Nomsa Dube — Kitchen Fit-Out">#KK-0043 · Nomsa Dube — Kitchen Fit-Out</option>
+            <option value="Lerato Corp — Office Desks">#KK-0039 · Lerato Corp — Office Desks</option>
+            <option value="Sipho Dlamini — Couch + TV Unit">#KK-0047 · Sipho Dlamini — Couch + TV Unit</option>
+          </select>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Tap to update status</div>
+        <div class="onetap-grid">
+          <div class="onetap-btn" onclick="tapUpdate('Production Started ⚒️','production started')">
+            <span class="ot-icon">⚒️</span>
+            <div class="ot-label">Production Started</div>
+            <div class="ot-sub">Notifies client work has begun</div>
+          </div>
+          <div class="onetap-btn" onclick="tapUpdate('Frame Complete 🔨','frame is complete')">
+            <span class="ot-icon">🔨</span>
+            <div class="ot-label">Frame Complete</div>
+            <div class="ot-sub">Sends progress update</div>
+          </div>
+          <div class="onetap-btn" onclick="tapUpdate('Finishing & Polish 🪵','finishing and polish stage')">
+            <span class="ot-icon">🪵</span>
+            <div class="ot-label">Finishing & Polish</div>
+            <div class="ot-sub">Almost there update</div>
+          </div>
+          <div class="onetap-btn" onclick="tapUpdate('Quality Check ✅','quality check in progress')">
+            <span class="ot-icon">✅</span>
+            <div class="ot-label">Quality Check</div>
+            <div class="ot-sub">Pre-delivery inspection</div>
+          </div>
+          <div class="onetap-btn" onclick="tapUpdate('Ready for Delivery 🎉','ready for delivery')">
+            <span class="ot-icon">🎉</span>
+            <div class="ot-label">Ready for Delivery</div>
+            <div class="ot-sub">Triggers delivery scheduling</div>
+          </div>
+          <div class="onetap-btn" onclick="tapUpdate('Delivered & Complete ⭐','delivered successfully')">
+            <span class="ot-icon">⭐</span>
+            <div class="ot-label">Mark Delivered</div>
+            <div class="ot-sub">Sends review request auto</div>
+          </div>
+        </div>
+        <div id="onetap-result" style="display:none;margin-top:16px;background:var(--green-dim);border:1px solid rgba(63,176,122,0.3);border-radius:12px;padding:14px;">
+          <div style="font-weight:700;color:var(--green);margin-bottom:6px;" id="onetap-result-title"></div>
+          <div style="font-size:0.78rem;color:var(--muted2);" id="onetap-result-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let selectedJob = 'Nomsa Dube — Kitchen Fit-Out';
+
+  function showPage(id, navEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    if (navEl) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navEl.classList.add('active');
+    }
+    const titles = {
+      overview: 'Overview', jobs: 'Active Jobs', bookings: 'Bookings',
+      quotes: 'Quotes', clients: 'Clients', revenue: 'Revenue',
+      materials: 'Materials', onetap: 'One-Tap Updates'
+    };
+    document.getElementById('page-heading').textContent = titles[id] || id;
+    buildChart();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = '✓ ' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function advanceJob(btn, client, job, newStatus) {
+    btn.textContent = newStatus + ' ✓';
+    btn.disabled = true;
+    btn.style.background = 'var(--green)';
+    showToast(client + ' notified: ' + job + ' is now ' + newStatus);
+  }
+
+  function updateJobSelect(sel) {
+    selectedJob = sel.value;
+  }
+
+  function tapUpdate(label, statusMsg) {
+    const res = document.getElementById('onetap-result');
+    const title = document.getElementById('onetap-result-title');
+    const body = document.getElementById('onetap-result-body');
+    title.textContent = '✓ ' + label + ' — WhatsApp sent!';
+    body.innerHTML = `WhatsApp sent to <strong style="color:var(--cream)">${selectedJob.split('—')[0].trim()}</strong>:<br><em style="color:var(--cream)">"Hi! Quick update on your order — your piece is now at ${statusMsg}. Track it anytime at yourbusiness.co.za/portal 🙌"</em><br><br><span style="font-size:0.7rem;">Notion job card updated automatically ✓</span>`;
+    res.style.display = 'block';
+    showToast('WhatsApp sent to client + Notion updated!');
+  }
+
+  function buildChart() {
+    const chart = document.getElementById('revenue-chart');
+    if (!chart) return;
+    const data = [
+      {m:'Jan', v:18000, active:false},
+      {m:'Feb', v:30000, active:false},
+      {m:'Mar', v:38500, active:true},
+      {m:'Apr', v:0, active:false},
+      {m:'May', v:0, active:false},
+      {m:'Jun', v:0, active:false},
+    ];
+    const maxV = 45000;
+    chart.innerHTML = '';
+    data.forEach(d => {
+      const wrap = document.createElement('div');
+      wrap.className = 'chart-bar-wrap';
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar' + (d.active ? ' active' : '');
+      const h = d.v ? Math.max(4, (d.v / maxV) * 100) : 4;
+      bar.style.height = h + 'px';
+      if (d.v > 0 && !d.active) bar.style.background = 'var(--border2)';
+      if (d.active) bar.style.background = 'var(--gold)';
+      if (d.v === 0) bar.style.background = 'var(--border)';
+      if (d.v > 0) bar.innerHTML = `<div class="bar-tooltip">R${d.v.toLocaleString()}</div>`;
+      wrap.appendChild(bar);
+      chart.appendChild(wrap);
+    });
+  }
+
+  buildChart();
+</script>
+
+<script>
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <a href="index.html" class="mbn-item">
+    <span class="mbn-icon">⌂</span>
+    <span class="mbn-label">Home</span>
+  </a>
+  <a href="pitch.html" class="mbn-item">
+    <span class="mbn-icon">📊</span>
+    <span class="mbn-label">Pitch</span>
+  </a>
+  <a href="client-demo.html" class="mbn-item">
+    <span class="mbn-icon">📱</span>
+    <span class="mbn-label">Demo</span>
+  </a>
+  <a href="admin.html" class="mbn-item active">
+    <span class="mbn-icon">⚒️</span>
+    <span class="mbn-label">Admin</span>
+  </a>
+  <a href="notion.html" class="mbn-item">
+    <span class="mbn-icon">🗂️</span>
+    <span class="mbn-label">Notion</span>
+  </a>
+</nav>
+</body>
+</html>

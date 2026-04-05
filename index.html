@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carpentry OS — Business Operations Demo · Mirembe Muse</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fdf8f0;
+  --surface: #f5ede0;
+  --card: #ede4d4;
+  --border: #d4c0a8;
+  --border2: #c4b098;
+  --gold: #8b5e2a;
+  --gold2: #a06e35;
+  --gold3: #6b4518;
+  --gold-dim: rgba(139,94,42,0.08);
+  --gold-glow: rgba(139,94,42,0.15);
+  --cream: #2d1a0e;
+  --cream2: #5a3d28;
+  --muted: #9a7a58;
+  --muted2: #7a5a38;
+  --white: #2d1a0e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; opacity: 0.4;
+}
+
+/* ── GOLD AMBIENT GLOW ── */
+.glow-orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(120px); pointer-events: none; z-index: 0;
+  animation: orb-drift 12s ease-in-out infinite;
+}
+.glow-1 { width: 400px; height: 400px; background: rgba(139,94,42,0.06); top: -100px; right: -100px; animation-delay: 0s; }
+.glow-2 { width: 300px; height: 300px; background: rgba(139,94,42,0.04); bottom: 100px; left: -80px; animation-delay: -6s; }
+
+@keyframes orb-drift {
+  0%,100% { transform: translate(0,0); }
+  50% { transform: translate(20px, 30px); }
+}
+
+/* ── MAIN WRAP ── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 48px 0 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mm-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.mm-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--gold3));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem; font-weight: 700; color: #000;
+  letter-spacing: -0.02em;
+}
+.mm-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem; font-weight: 600; color: var(--gold);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.header-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem; color: var(--muted2);
+  border: 1px solid var(--border2);
+  padding: 5px 12px; border-radius: 20px;
+  letter-spacing: 0.08em;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 72px 0 60px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem; color: var(--gold);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  animation: fadeUp 0.7s ease both;
+}
+.hero-eyebrow::before {
+  content: ''; width: 32px; height: 1px; background: var(--gold); display: block;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 300; line-height: 1.05;
+  color: var(--white); margin-bottom: 8px;
+  animation: fadeUp 0.7s 0.08s ease both;
+}
+.hero-title em {
+  font-style: italic; color: var(--gold);
+  font-weight: 300;
+}
+.hero-title strong {
+  font-weight: 700; font-style: normal; color: var(--white);
+  display: block;
+}
+
+.hero-sub {
+  font-size: 1rem; color: var(--muted2);
+  max-width: 480px; line-height: 1.75;
+  margin: 20px 0 36px;
+  animation: fadeUp 0.7s 0.16s ease both;
+}
+
+.hero-meta {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  animation: fadeUp 0.7s 0.24s ease both;
+}
+.meta-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.78rem; color: var(--muted2);
+}
+.meta-item .mi-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); flex-shrink: 0;
+}
+.meta-divider { color: var(--border2); font-size: 0.7rem; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem; color: var(--muted);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 40px 0 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── PRESENTATION CARDS ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 60px;
+}
+@media(max-width: 620px) { .cards-grid { grid-template-columns: 1fr; } }
+
+.pres-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  text-decoration: none;
+  display: flex; flex-direction: column;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  animation: fadeUp 0.7s ease both;
+}
+.pres-card:nth-child(1) { animation-delay: 0.3s; }
+.pres-card:nth-child(2) { animation-delay: 0.38s; }
+.pres-card:nth-child(3) { animation-delay: 0.46s; }
+.pres-card:nth-child(4) { animation-delay: 0.54s; }
+
+.pres-card:hover {
+  border-color: var(--gold-glow);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,94,42,0.12);
+}
+.pres-card:hover .card-arrow { transform: translate(3px, -3px); }
+.pres-card:hover .card-glow { opacity: 1; }
+
+/* Card glow on hover */
+.card-glow {
+  position: absolute; inset: 0; border-radius: 20px;
+  background: radial-gradient(ellipse at 20% 20%, rgba(139,94,42,0.05) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+
+.card-visual {
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.card-visual-bg {
+  position: absolute; inset: 0;
+  opacity: 0.4;
+}
+.card-visual-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 6rem; font-weight: 700;
+  color: rgba(255,255,255,0.04);
+  position: absolute;
+  line-height: 1;
+  user-select: none;
+}
+.card-visual-icon {
+  font-size: 2.2rem; position: relative; z-index: 1;
+  filter: drop-shadow(0 4px 20px rgba(139,94,42,0.3));
+}
+.card-tag {
+  position: absolute; top: 12px; left: 12px;
+  font-family: 'Space Mono', monospace; font-size: 0.55rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+  background: rgba(0,0,0,0.5); color: var(--muted2);
+  border: 1px solid var(--border2); z-index: 2;
+}
+.card-tag.featured {
+  background: rgba(139,94,42,0.15); color: var(--gold);
+  border-color: rgba(139,94,42,0.25);
+}
+
+.card-body {
+  padding: 20px 22px 20px;
+  flex: 1; display: flex; flex-direction: column;
+}
+.card-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem; color: var(--muted);
+  margin-bottom: 6px; letter-spacing: 0.1em;
+}
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 600; color: var(--white);
+  line-height: 1.2; margin-bottom: 6px;
+}
+.card-desc {
+  font-size: 0.78rem; color: var(--muted2);
+  line-height: 1.6; flex: 1; margin-bottom: 16px;
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.card-pill {
+  font-size: 0.62rem; padding: 2px 8px; border-radius: 4px;
+  background: var(--border); color: var(--muted2);
+  border: 1px solid var(--border2);
+}
+.card-arrow {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gold-dim); border: 1px solid rgba(139,94,42,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold); font-size: 0.75rem; flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+/* Featured card spans full width */
+.pres-card.featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  border-color: rgba(139,94,42,0.15);
+}
+.pres-card.featured .card-visual {
+  width: 220px; min-width: 220px; height: auto;
+  border-bottom: none; border-right: 1px solid var(--border);
+}
+@media(max-width:620px) {
+  .pres-card.featured { flex-direction: column; }
+  .pres-card.featured .card-visual { width: 100%; height: 120px; border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+/* ── WHAT TO EXPECT ── */
+.expect-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+  margin-bottom: 60px;
+}
+@media(max-width:620px){ .expect-grid { grid-template-columns: 1fr; } }
+.expect-item {
+  padding: 20px; border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  animation: fadeUp 0.7s ease both;
+}
+.expect-item:nth-child(1){ animation-delay:0.3s; }
+.expect-item:nth-child(2){ animation-delay:0.38s; }
+.expect-item:nth-child(3){ animation-delay:0.46s; }
+.expect-icon { font-size: 1.3rem; margin-bottom: 10px; display: block; }
+.expect-title { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 5px; }
+.expect-desc { font-size: 0.75rem; color: var(--muted2); line-height: 1.6; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 36px 0 48px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.footer-from {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.footer-prepared { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Space Mono',monospace; margin-bottom: 4px; }
+.footer-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; color: var(--white); }
+.footer-role { font-size: 0.75rem; color: var(--muted2); }
+.footer-contact { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+.footer-contact a { font-size: 0.75rem; color: var(--muted2); text-decoration: none; transition: color 0.15s; }
+.footer-contact a:hover { color: var(--gold); }
+.footer-valid {
+  width: 100%; padding-top: 20px; border-top: 1px solid var(--border);
+  font-family: 'Space Mono', monospace; font-size: 0.58rem;
+  color: var(--muted); display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.valid-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-right: 6px; animation: blink 2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HOVER LINE ON FEATURED CARD ── */
+.pres-card.featured::after {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.pres-card.featured:hover::after { opacity: 1; }
+
+/* ── SCROLL PROGRESS ── */
+.scroll-bar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold3), var(--gold), var(--gold2));
+  z-index: 100; transition: width 0.1s linear;
+  width: 0%;
+}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+  background: #141410; border-top: 1px solid #2a2a22;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+@media (max-width: 768px) {
+  .mobile-bottom-nav { display: flex; }
+  /* Stack header badge on very small screens */
+  header { flex-wrap: wrap; gap: 12px; padding-top: 32px; }
+}
+@media (max-width: 480px) {
+  header { flex-direction: column; align-items: flex-start; }
+  .header-badge { align-self: flex-start; }
+  .wrap { padding-bottom: 70px; }
+}
+.mbn-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; text-decoration: none; color: #888; padding: 4px 0;
+  font-family: sans-serif;
+}
+.mbn-item.active { color: #8b5e2a; }
+.mbn-icon { font-size: 1.2rem; line-height: 1; }
+.mbn-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+<div class="scroll-bar" id="scrollBar"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="mm-logo">
+      <div class="mm-mark">MM</div>
+      <div class="mm-name">Mirembe Muse</div>
+    </div>
+    <div class="header-badge">Digital Services · Feb 2026</div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Carpentry Business · Operations Demo</div>
+    <h1 class="hero-title">
+      <em>Digital Transformation</em>
+      <strong>Proposal</strong>
+    </h1>
+    <p class="hero-sub">
+      A complete walkthrough of your new digital system — from what your customers experience, to how you manage everything behind the scenes.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="mi-dot"></div> 4 interactive sections</div>
+      <div class="meta-divider">·</div>
+      <div class="meta-item"><div class="mi-dot"></div> Live demos — fully clickable</div>
+      <div class="meta-divider">·</div>
+      <div class="meta-item"><div class="mi-dot"></div> Valid 30 days from issue</div>
+    </div>
+  </div>
+
+  <!-- PRESENTATION SECTIONS -->
+  <div class="section-label">Presentation Sections</div>
+
+  <div class="cards-grid">
+
+    <!-- CARD 1: PITCH DECK — featured -->
+    <a class="pres-card featured" href="pitch.html">
+      <div class="card-glow"></div>
+      <div class="card-visual">
+        <div class="card-visual-bg" style="background: linear-gradient(135deg,#1a1400,#0c0c08);"></div>
+        <div class="card-visual-number">01</div>
+        <div class="card-visual-icon">📊</div>
+        <span class="card-tag featured">Start Here</span>
+      </div>
+      <div class="card-body">
+        <div class="card-num">Section 01 of 04</div>
+        <div class="card-title">Strategy & Investment Proposal</div>
+        <div class="card-desc">The full business case — the problem, the opportunity, all three tiers with pricing, ROI calculator, competitive analysis, and full project timeline. Navigate section by section.</div>
+        <div class="card-footer">
+          <div class="card-pills">
+            <span class="card-pill">3 Tiers</span>
+            <span class="card-pill">ROI Calculator</span>
+            <span class="card-pill">8 Screens</span>
+          </div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 2: CLIENT DEMO -->
+    <a class="pres-card" href="client-demo.html">
+      <div class="card-glow"></div>
+      <div class="card-visual">
+        <div class="card-visual-bg" style="background: linear-gradient(135deg,#0a1400,#080c04);"></div>
+        <div class="card-visual-number">02</div>
+        <div class="card-visual-icon">📱</div>
+        <span class="card-tag">Live Demo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-num">Section 02 of 04</div>
+        <div class="card-title">Your Customer's Experience</div>
+        <div class="card-desc">A fully clickable phone mockup. Tap through it like a real customer — from landing on your website to booking, paying a deposit, and tracking their order live.</div>
+        <div class="card-footer">
+          <div class="card-pills">
+            <span class="card-pill">Booking Flow</span>
+            <span class="card-pill">WhatsApp</span>
+            <span class="card-pill">Portal</span>
+          </div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 3: ADMIN DASHBOARD -->
+    <a class="pres-card" href="admin.html">
+      <div class="card-glow"></div>
+      <div class="card-visual">
+        <div class="card-visual-bg" style="background: linear-gradient(135deg,#e8ddd0,#d4c9b8);"></div>
+        <div class="card-visual-number">03</div>
+        <div class="card-visual-icon">⚒️</div>
+        <span class="card-tag">Interactive</span>
+      </div>
+      <div class="card-body">
+        <div class="card-num">Section 03 of 04</div>
+        <div class="card-title">Your Admin Dashboard</div>
+        <div class="card-desc">Your control centre. See every active job, incoming booking, quote, client, and revenue stat. Includes the One-Tap Updates panel — one button sends a WhatsApp to the client automatically.</div>
+        <div class="card-footer">
+          <div class="card-pills">
+            <span class="card-pill">Job Kanban</span>
+            <span class="card-pill">One-Tap WA</span>
+            <span class="card-pill">Revenue</span>
+          </div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 4: NOTION -->
+    <a class="pres-card" href="notion.html">
+      <div class="card-glow"></div>
+      <div class="card-visual">
+        <div class="card-visual-bg" style="background: linear-gradient(135deg,#e8ddd0,#d4c9b8);"></div>
+        <div class="card-visual-number">04</div>
+        <div class="card-visual-icon">🗂️</div>
+        <span class="card-tag">Backend</span>
+      </div>
+      <div class="card-body">
+        <div class="card-num">Section 04 of 04</div>
+        <div class="card-title">Your Notion Backend</div>
+        <div class="card-desc">A pixel-accurate replica of the Notion workspace you'll have. Five databases — Jobs, Clients, Quotes, Materials, Revenue. Three views per database. Click any row to open the full property panel.</div>
+        <div class="card-footer">
+          <div class="card-pills">
+            <span class="card-pill">5 Databases</span>
+            <span class="card-pill">Table · Board · Gallery</span>
+          </div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- WHAT TO EXPECT -->
+  <div class="section-label">What This Builds For You</div>
+  <div class="expect-grid">
+    <div class="expect-item">
+      <span class="expect-icon">⚡</span>
+      <div class="expect-title">Zero Admin Hours</div>
+      <div class="expect-desc">Every confirmation, reminder, status update, and receipt sends automatically. You focus on building — the system handles the communication.</div>
+    </div>
+    <div class="expect-item">
+      <span class="expect-icon">📈</span>
+      <div class="expect-title">Scale Without Limits</div>
+      <div class="expect-desc">The system handles 2 jobs or 20 jobs exactly the same way. Growth doesn't mean more admin — it means more revenue for the same effort.</div>
+    </div>
+    <div class="expect-item">
+      <span class="expect-icon">🏆</span>
+      <div class="expect-title">No Competitor Matches This</div>
+      <div class="expect-desc">Woodgrain, Carpenter JHB, Gregwood — none of them offer online booking, automated payments, or client tracking. You don't compete. You leapfrog.</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-from">
+      <div class="footer-prepared">Prepared by</div>
+      <div class="footer-name">Nanda · Creative Technologist</div>
+      <div class="footer-role">Mirembe Muse Digital Services (Pty) Ltd</div>
+    </div>
+    <div class="footer-contact">
+      <a href="tel:0842916742">084 291 6742</a>
+      <a href="/cdn-cgi/l/email-protection#b5ddd0d9d9daf5d8dcc7d0d8d7d0d8c0c6d09bd6da9bcfd4"><span class="__cf_email__" data-cfemail="e8808d848487a885819a8d858a8d859d9b8dc68b87c69289">[email&#160;protected]</span></a>
+      <a href="https://creativelynanda.co.za" target="_blank">CreativelyNanda.co.za</a>
+    </div>
+    <div class="footer-valid">
+      <span><span class="valid-dot"></span>This proposal is valid for 30 days from date of issue · Prices in ZAR · Exclude VAT</span>
+      <span>© 2026 Mirembe Muse Digital Services (Pty) Ltd</span>
+    </div>
+  </footer>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  window.addEventListener('scroll', () => {
+    const scrolled =  const doc = document.documentElement;
+    const scrolled = doc.scrollTop;
+    const height = doc.scrollHeight - doc.clientHeight;
+    document.getElementById('scrollBar').style.width = (scrolled / height * 100) + '%';
+  });
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <a href="index.html" class="mbn-item active">
+    <span class="mbn-icon">&#8962;</span>
+    <span class="mbn-label">Home</span>
+  </a>
+  <a href="pitch.html" class="mbn-item">
+    <span class="mbn-icon">&#128202;</span>
+    <span class="mbn-label">Pitch</span>
+  </a>
+  <a href="client-demo.html" class="mbn-item">
+    <span class="mbn-icon">&#128241;</span>
+    <span class="mbn-label">Demo</span>
+  </a>
+  <a href="admin.html" class="mbn-item">
+    <span class="mbn-icon">&#9874;&#65039;</span>
+    <span class="mbn-label">Admin</span>
+  </a>
+  <a href="notion.html" class="mbn-item">
+    <span class="mbn-icon">&#128194;</span>
+    <span class="mbn-label">Notion</span>
+  </a>
+</nav>
+</body>
+</html>
