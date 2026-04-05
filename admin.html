@@ -459,7 +459,69 @@ body{
   .mobile-home-btn { font-size: 0.72rem; color: #888; text-decoration: none; border: 1px solid #2a2a2a; border-radius: 6px; padding: 4px 10px; transition: color 0.15s, border-color 0.15s; }
   .mobile-home-btn:hover { color: #8b5e2a; border-color: #8b5e2a; }
   .main { width: 100% !important; min-width: 0 !important; padding-bottom: 80px !important; }
+
+  /* Topbar */
+  .topbar { padding: 0 12px; height: auto; min-height: 48px; flex-wrap: wrap; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  .topbar-left { flex: 1; min-width: 0; }
+  .page-title { font-size: 0.88rem; }
+  .page-date { display: none; }
+  .topbar-right { gap: 6px; }
+  .topbar-btn:not(.primary) { display: none; }
+  .topbar-btn.primary { padding: 5px 10px; font-size: 0.7rem; }
+  .notif-btn { width: 30px; height: 30px; }
+
+  /* Page padding */
+  .page { padding: 12px; gap: 12px; }
+
+  /* Stats row — 2 columns on mobile */
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-value { font-size: 1.2rem; }
+  .stat-card { padding: 12px 14px; }
+
+  /* Content grids — stack vertically */
+  .content-grid { grid-template-columns: 1fr; }
+  .content-grid-3 { grid-template-columns: 1fr; }
+
+  /* Booking alert — stack on small screens */
+  .booking-alert { flex-direction: column; gap: 10px; }
+  .booking-alert-icon { width: 32px; height: 32px; font-size: 0.9rem; }
+  .booking-alert-actions { flex-wrap: wrap; gap: 6px; }
+  .booking-alert-actions .action-btn { flex: 1; min-width: 120px; text-align: center; }
+
+  /* Quote items — stack */
+  .quote-item { flex-wrap: wrap; gap: 8px; }
+  .quote-num { min-width: auto; }
+  .quote-desc { font-size: 0.82rem; }
+  .quote-amount { min-width: auto; text-align: left; font-size: 0.85rem; }
+
+  /* Job cards */
+  .job-card-top { flex-wrap: wrap; gap: 6px; }
+  .job-footer { flex-wrap: wrap; gap: 8px; }
+  .job-actions { width: 100%; justify-content: flex-end; }
+
+  /* Client table — scroll horizontally */
+  .panel-body { padding: 10px 12px; }
+
+  /* Panel header — wrap on small screens */
+  .panel-header { flex-wrap: wrap; gap: 8px; }
+  .panel-header > div { flex-wrap: wrap; gap: 6px; }
+
+  /* One-tap grid stays 2 cols, but smaller padding */
+  .onetap-btn { padding: 10px 8px; }
+  .onetap-btn .ot-icon { font-size: 1.2rem; }
 }
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-value { font-size: 1.1rem; }
+  .booking-alert-actions .action-btn { min-width: 0; font-size: 0.65rem; padding: 6px 8px; }
+  .quote-item { gap: 6px; }
+  .topbar-btn.primary { font-size: 0.68rem; padding: 5px 8px; }
+  .action-btn { font-size: 0.65rem; padding: 5px 8px; }
+  .onetap-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .job-name { font-size: 0.8rem; }
+  .page { padding: 10px; gap: 10px; }
+}
+
 @media (min-width: 769px) {
   .mobile-header { display: none; }
   .sidebar-overlay { display: none !important; }
@@ -1189,6 +1251,8 @@ body{
     };
     document.getElementById('page-heading').textContent = titles[id] || id;
     buildChart();
+    // Close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) closeSidebar();
   }
 
   function showToast(msg) {
